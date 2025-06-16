@@ -15,7 +15,7 @@ build/
 bin/
 *.run
 *.elf
-
+compile_commands.json
 __pycache__/
 *.py[cod]
 *.pyo
