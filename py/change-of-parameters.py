@@ -15,7 +15,7 @@ from matplotlib.ticker import MaxNLocator, FormatStrFormatter
 
 # change of c
 a, b = 0.2, 0.2
-values = [1, 2.5, 3.5, 5, 5.3, 5.7, 5.9, 5.99, 6]
+values = [1, 2.7, 3.5, 5, 5.3, 5.7, 5.9, 5.99, 6]
 
 total_time = 5000
 dt = 0.001

@@ -33,6 +33,6 @@ __pycache__/
 Thumbs.db
 
 feigenbaum
-lyapunov
+upper-bound
+lower-bound
 poincare-bifurcation-diagram
-pw-boundaries
