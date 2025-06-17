@@ -5,11 +5,8 @@
 
 using namespace capd;
 
-// first: 4.35 - 4.45
-// second: 4.65 - 4.75
-// third: 5.15 - 5.5
 void bf_diagram_data(std::vector<double> a_range, DVector x, int N) {
-    std::ofstream a_out("output/bif-a.csv"), x_out("output/bif-x.csv");
+    std::ofstream a_out("output/tpw-bif-a.csv"), x_out("output/tpw-bif-x.csv");
     for (double a : a_range) {
         PoincareMap poincare(a);
         for (int t = 0; t < N; t++) {
@@ -29,14 +26,15 @@ int main() {
     double return_time = 0;
     double initial_cond[] = {0, -5, 0.03};
     DVector x(3, initial_cond);
+
     // whole
-    std::vector<double> a_range = linspace<double>(2.5, 5.7, 2000);
+    // std::vector<double> a_range = linspace<double>(2.5, 5.7, 2000);
     // first
     // std::vector<double> a_range = linspace<double>(4.379, 4.4, 350);
     // second
     // std::vector<double> a_range = linspace<double>(4.693, 4.725, 1000);
     // third
-    // std::vector<double> a_range = linspace<double>(5.17, 5.55, 1000);
+    std::vector<double> a_range = linspace<double>(5.17, 5.55, 1000);
 
     bf_diagram_data(a_range, x, N);
     return 0;

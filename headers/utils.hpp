@@ -55,14 +55,14 @@ class SectionMap {
     SectionMap(IPoincareMap &Q) { P = &Q; }
     SectionMap() {}
 
-    IVector image(IVector &x, IMatrix &DP, int period = 1);
-    IVector image(IVector &x, int period = 1);
-    IMatrix derivative(IVector &x, int period = 1);
+    IVector image(IVector &x, IMatrix &DP, int iter = 1);
+    IVector image(IVector &x, int iter = 1);
+    IMatrix derivative(IVector &x, int iter = 1);
 
-    IVector operator()(IVector &x, IMatrix &DP, int period = 1) {
-        return image(x, DP, period);
+    IVector operator()(IVector &x, IMatrix &DP, int iter = 1) {
+        return image(x, DP, iter);
     }
-    IVector operator()(IVector &x, int period = 1) { return image(x, period); }
+    IVector operator()(IVector &x, int iter = 1) { return image(x, iter); }
     IMatrix operator[](IVector &x) { return derivative(x); }
 };
 
@@ -73,7 +73,7 @@ struct RosslerSystem {
     IOdeSolver solver;
     IPoincareMap P;
     SectionMap poincare_2d;
-    int periodation;
+    int iteration;
 
     RosslerSystem(interval a)
         : order(20),
@@ -84,8 +84,8 @@ struct RosslerSystem {
         rossler.setParameter("b", interval(0.2));
     }
 
-    bool has_smaller_period(IVector &point, int period);
-    bool is_periodic_and_stable(IVector &initial_guess, int N, int period,
+    bool has_smaller_iter(IVector &point, int iter);
+    bool is_periodic_and_stable(IVector &initial_guess, int N, int iter,
                                 bool is_final_check);
 };
 

@@ -9,7 +9,6 @@ x_vals = np.linspace(-4, 4, 20)
 y_vals = np.linspace(-4, 4, 20)
 X, Y = np.meshgrid(x_vals, y_vals)
 
-# Setup figure
 fig, axes = plt.subplots(2, 3, figsize=(12, 10))
 axes = axes.flatten()
 
@@ -29,4 +28,4 @@ for i, a in enumerate(a_values):
     ax.set_aspect("equal")
 
 plt.tight_layout()
-plt.savefig("../images/portrety-fazowe-xy", bbox_inches="tight", dpi=500)
+plt.savefig("../images/phase-portraits-xy", bbox_inches="tight", dpi=500)

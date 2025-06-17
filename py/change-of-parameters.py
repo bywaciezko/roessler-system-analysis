@@ -17,16 +17,12 @@ from matplotlib.ticker import MaxNLocator, FormatStrFormatter
 a, b = 0.2, 0.2
 values = [1, 2.5, 3.5, 5, 5.3, 5.7, 5.9, 5.99, 6]
 
-# Define the total simulation time and the time step
 total_time = 5000
 dt = 0.001
 t = np.arange(0, total_time, dt)
 
-# Define the transient time duration (e.g., discard the first 100 time units)
 transient_time = total_time / 2
 
-# Find the index corresponding to the transient time
-# This ensures that we discard enough initial data
 transient_idx = int(transient_time / dt)
 
 
@@ -45,7 +41,6 @@ all_sols = [
 xs, ys, zs = [], [], []
 for sol in all_sols:
     x, y, z = sol.y
-    # Apply the transient_idx here to collect data for common axis limits
     xs += list(x[transient_idx:])
     ys += list(y[transient_idx:])
     zs += list(z[transient_idx:])
@@ -66,7 +61,6 @@ fig, axs = plt.subplots(3, 3, figsize=(14, 12), subplot_kw={"projection": "3d"})
 for ax, (c, sol) in zip(axs.flatten(), zip(values, all_sols)):
     # wyrzuc poczatkowe punkty tajektorii:
     x, y, z = sol.y
-    # Use the calculated transient_idx for plotting as well
     x, y, z = x[transient_idx:], y[transient_idx:], z[transient_idx:]
 
     # zmiana koloru dla wyjsciowego parametru c = 5.7
@@ -85,7 +79,7 @@ for ax, (c, sol) in zip(axs.flatten(), zip(values, all_sols)):
         ax.scatter(x0, y0, z0, c="red", marker=".", s=100, label=r"punkt stały $P_{2}$")
 
     ax.set_title(rf"$c = {c}$")
-    # ax.set_xlim(*xlim)  # It's good to keep these for consistent scaling
+    # ax.set_xlim(*xlim)  # ta sama skala dla każdego wykresu
     # ax.set_ylim(*ylim)
     # ax.set_zlim(*zlim)
     ax.set_box_aspect((1, 1, 1))
@@ -102,4 +96,3 @@ for ax, (c, sol) in zip(axs.flatten(), zip(values, all_sols)):
 
 plt.tight_layout()
 plt.savefig("../images/change-of-c-param.png", bbox_inches="tight", dpi=500)
-# plt.show()  # Added plt.show() to display the plot immediately

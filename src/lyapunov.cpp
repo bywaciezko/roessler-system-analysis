@@ -3,14 +3,14 @@
 static const char *menu =
     "======================================================"
     "====\n"
-    "|| Ktore okno mierzymy?\n"
-    "|| 1. pierwsze \n"
-    "|| 2. drugie \n"
-    "|| 3. trzecie \n"
+    "|| Wybierz okno do pomiaru\n"
+    "|| 1. Okno I  \n"
+    "|| 2. Okno II \n"
+    "|| 3. Okno III \n"
     "======================================================"
     "====\n";
 
-static const char *prompt = "wybor: ";
+static const char *prompt = "Twój wybór: ";
 
 DVector random_unit_vector() {
     static thread_local std::mt19937 gen(std::random_device{}());
@@ -25,6 +25,7 @@ DVector random_unit_vector() {
     return vec / norm(vec);
 }
 
+// Liczy wartość wykładnika Lapunowa
 double lyapunov_exponent(double a, DVector x, int N) {
     PoincareMap poincare(a);
     static vectalg::EuclLNorm<DVector, DMatrix> norm;
@@ -48,6 +49,7 @@ double lyapunov_exponent(double a, DVector x, int N) {
     return sum_log_norms / N;
 }
 
+// Funkcja mierząca górne ograniczenie
 void find_upper_bound(std::vector<double> &a_range, DVector x, int N,
                       double eps) {
     const int stable_count =
@@ -60,19 +62,16 @@ void find_upper_bound(std::vector<double> &a_range, DVector x, int N,
         double a = a_range[i];
         double le = lyapunov_exponent(a, x, N);
 
-        std::cout << "a: " << a << ", LE: " << le << '\n';
-
         // przejście z ujemnego na dodatni
         if (prev_le < 0 && le >= eps) {
             bool stable = true;
 
-            // sprawdź stabilność dodatniego LE przez następne stable_count
+            // sprawdza stabilność dodatniego LE przez następne stable_count
             // punktów
             for (int j = 1; j <= stable_count && (i + j) < a_range.size();
                  ++j) {
                 double le_check = lyapunov_exponent(a_range[i + j], x, N);
-                std::cout << "  checking a: " << a_range[i + j]
-                          << ", LE: " << le_check << '\n';
+
                 if (le_check < eps) {
                     stable = false;
                     break;
@@ -91,6 +90,7 @@ void find_upper_bound(std::vector<double> &a_range, DVector x, int N,
     }
 }
 
+// do generowania wykresu
 void plot_data(std::vector<double> &a_range, DVector x, int N) {
     std::ofstream a_param("output/fpw-le-a.csv"), lambda1("output/fpw-le.csv");
 
@@ -121,37 +121,38 @@ int main() {
 
             switch (input) {
             case 1: {
-                // std::vector<double> a_range =
-                //     linspace<double>(4.395, 4.396, 500);
+                std::vector<double> a_range =
+                    linspace<double>(4.395, 4.396, 500);
 
-                // find_upper_bound(a_range, x, N, eps);
+                find_upper_bound(a_range, x, N, eps);
 
                 // ======
-                std::vector<double> a_range =
-                    linspace<double>(4.375, 4.4, 5000);
-                plot_data(a_range, x, N);
+                // std::vector<double> a_range =
+                //     linspace<double>(4.375, 4.4, 5000);
+                // plot_data(a_range, x, N);
 
                 break;
             };
             case 2: {
-                // std::vector<double> a_range = linspace(4.72, 4.722, 500);
+                std::vector<double> a_range = linspace(4.72, 4.722, 500);
 
-                // find_upper_bound(a_range, x, N, eps);
+                find_upper_bound(a_range, x, N, eps);
+
                 // ======
-                std::vector<double> a_range =
-                    linspace<double>(4.39, 4.726, 5000);
-                plot_data(a_range, x, N);
+                // std::vector<double> a_range =
+                //     linspace<double>(4.39, 4.726, 5000);
+                // plot_data(a_range, x, N);
                 break;
             }
             case 3: {
-                // std::vector<double> a_range = linspace(5.49, 5.51, 500);
+                std::vector<double> a_range = linspace(5.49, 5.51, 500);
 
-                // find_upper_bound(a_range, x, N, eps);
+                find_upper_bound(a_range, x, N, eps);
 
                 // ======
-                std::vector<double> a_range =
-                    linspace<double>(5.15, 5.525, 5000);
-                plot_data(a_range, x, N);
+                // std::vector<double> a_range =
+                //     linspace<double>(5.15, 5.525, 5000);
+                // plot_data(a_range, x, N);
                 break;
             }
             default:

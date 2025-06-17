@@ -7,7 +7,8 @@ PoincareMap::PoincareMap(double a)
     rossler.setParameter("b", 2. / 10.);
 }
 
-IVector SectionMap::image(IVector &x, IMatrix &DP, int period) {
+// zwraca obraz iter-iteracji odwzorowania, i zapisuje różniczkę w DP
+IVector SectionMap::image(IVector &x, IMatrix &DP, int iter) {
     IVector X({0., 0., 0.});
     X[1] = x[0];
     X[2] = x[1];
@@ -15,8 +16,8 @@ IVector SectionMap::image(IVector &x, IMatrix &DP, int period) {
     C1Rect2Set Q(X);
     IMatrix DP3(3, 3);
 
-    IVector Y = (*P)(Q, DP3, period);
-    DP3 = P->computeDP(Y, DP3, period);
+    IVector Y = (*P)(Q, DP3, iter);
+    DP3 = P->computeDP(Y, DP3, iter);
 
     IVector y(2);
     y[0] = Y[1];
@@ -24,14 +25,15 @@ IVector SectionMap::image(IVector &x, IMatrix &DP, int period) {
     return y;
 }
 
-IVector SectionMap::image(IVector &x, int period) {
+// liczy tylko obraz
+IVector SectionMap::image(IVector &x, int iter) {
     IVector X({0., 0., 0.});
     X[1] = x[0];
     X[2] = x[1];
 
     C0Rect2Set Q(X);
 
-    IVector Y = (*P)(Q, period);
+    IVector Y = (*P)(Q, iter);
 
     IVector y(2);
     y[0] = Y[1];
@@ -40,12 +42,14 @@ IVector SectionMap::image(IVector &x, int period) {
     return y;
 }
 
-IMatrix SectionMap::derivative(IVector &x, int period) {
+// liczy tylko pochodną
+IMatrix SectionMap::derivative(IVector &x, int iter) {
     IMatrix DP(2, 2);
-    image(x, DP, period);
+    image(x, DP, iter);
     return DP;
 }
 
+// liczy wartości własne dla macierzy 2x2
 vector<interval> eigenvalues2x2(IMatrix &M) {
     interval a = M[0][0];
     interval b = M[0][1];
@@ -62,23 +66,27 @@ vector<interval> eigenvalues2x2(IMatrix &M) {
     return {lambda1, lambda2};
 }
 
-bool RosslerSystem::has_smaller_period(IVector &point, int period) {
-    for (int d = 1; d < period; ++d) {
-        if (period % d == 0) {
+// sprawdza czy dany okres-iter jest okresem podstawowym punktu-point
+bool RosslerSystem::has_smaller_iter(IVector &point, int iter) {
+    for (int d = 1; d < iter; ++d) {
+        if (iter % d == 0) {
             IVector image = poincare_2d(point, d);
             if (subset(image, point)) {
-                cout << "The point has a smaller fundamental period: " << d
-                     << '\n';
+                cout << "The point has a smaller fundamental "
+                        "period: "
+                     << d << '\n';
                 return true;
             }
         }
     }
 
-    cout << "Period " << period << " is the fundamental period of the point.\n";
+    cout << "Period " << iter << " is the fundamental period of the point.\n";
     return false;
 }
+
+// glowna funkcja do sprawdzania, czy dany punkt jest okresowy i stabilny
 bool RosslerSystem::is_periodic_and_stable(IVector &initial_guess, int N,
-                                           int period, bool is_final_check) {
+                                           int iter, bool is_final_check) {
     IVector current_guess = initial_guess;
     IVector poincare_image, prev_guess, verified_point(2);
     IMatrix Id = IMatrix({{1., 0.}, {0., 1.}});
@@ -86,11 +94,14 @@ bool RosslerSystem::is_periodic_and_stable(IVector &initial_guess, int N,
 
     int steps = 0;
     try {
+
+        // wykonujemy wstępne iteracje, aby trajektoria punktu mogła się
+        // ustabilizować
         while (true) {
             current_guess = midVector(current_guess);
             prev_guess = current_guess;
 
-            poincare_image = poincare_2d(current_guess, dp, period);
+            poincare_image = poincare_2d(current_guess, dp, iter);
             current_guess =
                 current_guess - gauss(dp - Id, poincare_image - current_guess);
 
@@ -99,22 +110,26 @@ bool RosslerSystem::is_periodic_and_stable(IVector &initial_guess, int N,
                 break;
         }
 
+        // jeżeli punkt jest dobrym kandydatem, to wywołujemy faktyczną
+        // metodę Newtona
         if (steps < N) {
             double delta = 1e-9;
             IVector small_box(2);
             small_box[0] = current_guess[0] + delta * interval(-1.0, 1.0);
             small_box[1] = current_guess[1] + delta * interval(-1.0, 1.0);
 
-            poincare_2d(small_box, dp, period);
+            poincare_2d(small_box, dp, iter);
 
             verified_point = current_guess -
-                             gauss(dp - Id, poincare_2d(current_guess, period) -
+                             gauss(dp - Id, poincare_2d(current_guess, iter) -
                                                 current_guess);
 
+            // jeśli zweryfikowany punkt mieści się wewnątrz
+            // otoczenia
             if (subsetInterior(verified_point, small_box)) {
 
-                // STABILITY CHECK
-                poincare_2d(verified_point, dp, period);
+                // sprawdzenie stabilności
+                poincare_2d(verified_point, dp, iter);
                 auto eigenvalues = eigenvalues2x2(dp);
 
                 bool is_stable = true;
@@ -125,15 +140,15 @@ bool RosslerSystem::is_periodic_and_stable(IVector &initial_guess, int N,
                     }
                 }
 
-                // SPRAWDZENIE CZY NIE MA MNIEJSZEGO OKRESU
+                // sprawdzenie, czy nie ma mniejszego okresu
                 if (is_final_check) {
-                    std::cout << "A stationary point for P^" << period
+                    std::cout << "A stationary point for P^" << iter
                               << " is in " << verified_point << " proven. \n";
 
-                    std::cout << "The periodic orbit is "
+                    std::cout << "The perioic orbit is "
                               << (is_stable ? "stable." : "unstable.") << '\n';
 
-                    return !has_smaller_period(verified_point, period);
+                    return !has_smaller_iter(verified_point, iter);
                 }
 
                 return is_stable;

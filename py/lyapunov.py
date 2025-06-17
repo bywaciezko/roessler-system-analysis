@@ -1,12 +1,12 @@
 import plotter
 
 # first
-lower_bound = 4.380026185035703
-upper_bound = 4.39562124248497
-
-file_path = "../images/fpw-le.png"
-path_x = "../output/fpw-le-a.csv"
-path_y = "../output/fpw-le.csv"
+# lower_bound = 4.380026185035703
+# upper_bound = 4.39562124248497
+#
+# file_path = "../images/fpw-le.png"
+# path_x = "../output/fpw-le-a.csv"
+# path_y = "../output/fpw-le.csv"
 
 # second
 # lower_bound = 4.694104184150694
@@ -17,11 +17,11 @@ path_y = "../output/fpw-le.csv"
 # path_y = "../output/sec_pw-le.csv"
 
 # third
-# lower_bound = 5.185404746055601
-# upper_bound = 5.497374749498998
-# file_path = "../images/tpw-le-1.png"
-# path_x = "../output/tpw-le-a.csv"
-# path_y = "../output/tpw-le.csv"
+lower_bound = 5.185404746055601
+upper_bound = 5.497374749498998
+file_path = "../images/tpw-le-1.png"
+path_x = "../output/tpw-le-a.csv"
+path_y = "../output/tpw-le.csv"
 
 
 def draw_zero_line(ax):
@@ -58,9 +58,9 @@ x_label = "c"
 y_label = "Lyapunov exponent"
 alpha_ = 1
 DPI = 350
-major_ticker = 0.005
-minor_ticker = 0.0005
-format = "%.3f"
+major_ticker = 0.05
+minor_ticker = 0.005
+format = "%.1f"
 markerformat = ","
 
 plotter.plot(

@@ -12,7 +12,7 @@ objdir = .obj
 srcdir = src
 
 # programy
-progs = poincare-bifurcation-diagram lyapunov feigenbaum pw-boundaries_2
+progs = poincare-bifurcation-diagram lyapunov feigenbaum pw-boundaries
 # utils
 utils_obj = ${objdir}/utils.o
 
